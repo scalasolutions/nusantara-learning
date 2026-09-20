@@ -44,6 +44,14 @@ test('quiz answers track best score and reward XP only for a correct answer', ()
   assert.equal(state.quizBest.whatIsIndonesia ?? state.quizBest['what-is-indonesia'], 1);
 });
 
+test('repeating a completed quiz does not farm XP', () => {
+  let state = createInitialState();
+  state = markAnswer(state, 'what-is-indonesia', true);
+  state = markAnswer(state, 'what-is-indonesia', true);
+  assert.equal(state.xp, 10);
+  assert.equal(state.quizBest['what-is-indonesia'], 1);
+});
+
 test('reminder is due when enabled and not completed today', () => {
   const state = { reminderEnabled: true, lastStudyDate: '2026-09-17' };
   assert.equal(shouldRemindToday(state, '2026-09-18'), true);

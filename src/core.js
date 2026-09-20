@@ -86,8 +86,8 @@ export function completeLesson(state, lessonId, today, lessons = DEFAULT_LESSON_
 export function markAnswer(state, lessonId, correct) {
   const next = normalizeState(state);
   if (!correct) return next;
-  next.xp += ANSWER_XP;
   const prior = Number(next.quizBest[lessonId] || 0);
+  if (prior < 1) next.xp += ANSWER_XP;
   next.quizBest = { ...next.quizBest, [lessonId]: Math.max(prior, 1) };
   return next;
 }
