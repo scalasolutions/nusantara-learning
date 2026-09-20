@@ -1,5 +1,5 @@
 import { LESSONS, REGIONS } from './content.js';
-import './resources.js';
+import { MEDIA, RESOURCE_SETS } from './resources.js';
 import {
   calculateProgress, completeLesson, createInitialState, getDueReviews, getToday, markAnswer, normalizeState, reviewLesson, shouldRemindToday,
 } from './core.js';
@@ -20,8 +20,9 @@ function getRoute() {
   if (parts[0] === 'class' && LESSONS.some((item) => item.id === parts[1])) return { type: 'class', id: parts[1] };
   return { type: 'home' };
 }
-function currentLesson() { return LESSONS.find((item) => item.id === state.currentLessonId) || LESSONS[0]; }
-function findLesson(id) { return LESSONS.find((item) => item.id === id) || LESSONS[0]; }
+function withResources(item) { return { ...item, media: MEDIA[item.id], resources: RESOURCE_SETS[item.id] }; }
+function currentLesson() { return withResources(LESSONS.find((item) => item.id === state.currentLessonId) || LESSONS[0]); }
+function findLesson(id) { return withResources(LESSONS.find((item) => item.id === id) || LESSONS[0]); }
 function completed(id) { return state.completedLessonIds.includes(id); }
 function nav() { return `<nav class="app-nav"><a href="#/" class="nav-link">Learn</a><a href="#/dashboard" class="nav-link">My dashboard</a></nav>`; }
 function header() { return `<header class="topbar"><a class="brand" href="#/" aria-label="Nusantara Learning home"><span class="brand-mark">✦</span><span><strong>Nusantara</strong><small>Learning journey</small></span></a><div class="top-actions">${nav()}<span class="stat-pill streak">🔥 <b>${state.streak}</b></span><span class="stat-pill xp">✦ <b>${state.xp}</b> XP</span><a href="#/dashboard" class="avatar" aria-label="Open profile">${escapeHtml((state.profile.name || 'FY').slice(0, 2).toUpperCase())}</a></div></header>`; }

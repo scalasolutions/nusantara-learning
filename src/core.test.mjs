@@ -11,6 +11,15 @@ import {
   reviewLesson,
   shouldRemindToday,
 } from './core.js';
+import { LESSONS } from './content.js';
+import { MEDIA, RESOURCE_SETS } from './resources.js';
+
+test('resource data stays separate from lesson content', () => {
+  assert.equal(LESSONS[0].media, undefined);
+  assert.equal(LESSONS[0].resources, undefined);
+  assert.equal(MEDIA[LESSONS[0].id].creditUrl.includes('commons.wikimedia.org'), true);
+  assert.equal(RESOURCE_SETS[LESSONS[0].id].length, 2);
+});
 
 test('new learners start at lesson one with zero XP', () => {
   const state = createInitialState();

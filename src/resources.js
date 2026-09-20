@@ -1,6 +1,4 @@
 
-import { LESSONS } from './content.js';
-
 const MEDIA = {
   'what-is-indonesia': {
     image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Province_Flag_Map_Indonesia_Map.png/960px-Province_Flag_Map_Indonesia_Map.png',
@@ -66,10 +64,5 @@ const RESOURCE_SETS = {
     ['Read', 'US Office of the Historian — Indonesia', 'https://history.state.gov/countries/indonesia', 'A second perspective for post-independence chronology.'],
   ],
 };
-
-LESSONS.forEach((item) => {
-  item.media = MEDIA[item.id];
-  item.resources = RESOURCE_SETS[item.id];
-});
 
 export { MEDIA, RESOURCE_SETS };

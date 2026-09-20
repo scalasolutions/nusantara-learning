@@ -20,3 +20,9 @@
 - Fixed streak integrity: a study day now extends the streak only when it follows the previous study date immediately; studying after a gap correctly starts a new one-day streak. Added a regression test while preserving all existing state fields and XP behavior.
 - Verification: focused RED test failed with streak 3 instead of 1, then passed after the fix; `npm test` (11 passing), `npm run build` (Vite production build passed), `git diff --check` (passed), and local HTTP smoke checks returned the app shell, manifest, and service worker successfully from Vite.
 - Remaining risks: automated browser tooling is not installed in this repo, so this cycle used local HTTP smoke verification rather than a full interactive browser session. Progress, reminders, and review state remain device-local; browser notifications are best-effort and do not guarantee delivery while the app is closed.
+
+## 2026-09-21 05:23 WIB
+- Separated lesson content from media/resource metadata: `resources.js` now exports immutable lookup data, while the UI composes resource-enriched lesson views without mutating the content module at import time. This preserves the current storage/state contract and reduces SPA blank-screen risk as content scales.
+- Added a regression test proving lesson content remains free of injected resource properties while all six classes retain media/resource lookups.
+- Verification: focused RED test failed because the old module mutated lessons, then passed after refactor; `npm test` (12 passing), `npm run build` (Vite production build passed), `git diff --check` (passed), and local Vite HTTP smoke checks for the app shell, module wiring, and class hash route passed.
+- Remaining risks: full interactive browser automation is unavailable in this repo; progress, reminders, and review state remain device-local; browser notifications are best-effort and do not guarantee delivery while the app is closed.
