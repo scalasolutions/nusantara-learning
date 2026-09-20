@@ -29,3 +29,8 @@
 - Added a regression test proving lesson content remains free of injected resource properties while all six classes retain media/resource lookups.
 - Verification: focused RED test failed because the old module mutated lessons, then passed after refactor; `npm test` (12 passing), `npm run build` (Vite production build passed), `git diff --check` (passed), and local Vite HTTP smoke checks for the app shell, module wiring, and class hash route passed.
 - Remaining risks: full interactive browser automation is unavailable in this repo; progress, reminders, and review state remain device-local; browser notifications are best-effort and do not guarantee delivery while the app is closed.
+
+## 2026-09-21 06:29 WIB
+- Hardened backward-compatible local state repair: duplicate completed lesson IDs are deduplicated, non-positive/non-integer quiz scores are discarded, and review records now require a valid interval within the scheduler and an ISO date shape. This prevents malformed local storage from inflating progress or surfacing invalid review entries.
+- Verification: focused RED test failed on duplicate completion data as expected; `npm test` (14 passing), `npm run build` (Vite production build passed), `git diff --check` (passed), and Vite + headless Chrome smoke checks confirmed the app serves and fresh users receive the onboarding screen. Chrome emitted only expected headless macOS display/task-policy warnings; no app runtime error was observed.
+- Remaining risks: browser interaction automation beyond headless DOM rendering is not wired into the repo; progress, reminders, and review state remain device-local; browser notifications are best-effort and do not guarantee delivery while the app is closed.

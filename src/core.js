@@ -41,11 +41,13 @@ export function normalizeState(input = {}) {
     onboardingCompleted: input.onboardingCompleted === true || (input.onboardingCompleted === undefined && hasLegacyActivity),
     currentLessonId: typeof input.currentLessonId === 'string' ? input.currentLessonId : initial.currentLessonId,
     completedLessonIds: Array.isArray(input.completedLessonIds)
-      ? input.completedLessonIds.filter((id) => typeof id === 'string')
+      ? [...new Set(input.completedLessonIds.filter((id) => typeof id === 'string'))]
       : [],
     xp: Number.isFinite(input.xp) && input.xp >= 0 ? input.xp : 0,
     streak: Number.isFinite(input.streak) && input.streak >= 0 ? input.streak : 0,
-    quizBest: input.quizBest && typeof input.quizBest === 'object' ? input.quizBest : {},
+    quizBest: input.quizBest && typeof input.quizBest === 'object' ? Object.fromEntries(
+      Object.entries(input.quizBest).filter(([, score]) => Number.isInteger(score) && score > 0),
+    ) : {},
     reminderEnabled: input.reminderEnabled === true,
     reminderTime: typeof input.reminderTime === 'string' ? input.reminderTime : initial.reminderTime,
     notes: input.notes && typeof input.notes === 'object' ? input.notes : {},
@@ -54,7 +56,11 @@ export function normalizeState(input = {}) {
       : initial.profile,
     history: Array.isArray(input.history) ? input.history.filter((item) => item && typeof item.lessonId === 'string') : [],
     reviews: input.reviews && typeof input.reviews === 'object' ? Object.fromEntries(
-      Object.entries(input.reviews).filter(([, review]) => review && Number.isInteger(review.interval) && typeof review.nextReviewDate === 'string'),
+      Object.entries(input.reviews).filter(([, review]) => review
+        && Number.isInteger(review.interval)
+        && review.interval >= 0
+        && review.interval < REVIEW_INTERVALS.length
+        && /^\d{4}-\d{2}-\d{2}$/.test(review.nextReviewDate)),
     ) : {},
   };
 }

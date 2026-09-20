@@ -81,6 +81,21 @@ test('invalid persisted state is repaired safely', () => {
   assert.equal(getNextLesson(state, [{ id: 'a' }]).id, 'a');
 });
 
+test('normalization removes duplicate progress and invalid quiz or review records', () => {
+  const state = normalizeState({
+    completedLessonIds: ['a', 'a', 'b', 42],
+    quizBest: { a: 2, b: 'bad', c: -1 },
+    reviews: {
+      a: { interval: 2, nextReviewDate: '2026-09-20' },
+      b: { interval: 99, nextReviewDate: 'not-a-date' },
+      c: { interval: -1, nextReviewDate: '2026-09-20' },
+    },
+  });
+  assert.deepEqual(state.completedLessonIds, ['a', 'b']);
+  assert.deepEqual(state.quizBest, { a: 2 });
+  assert.deepEqual(state.reviews, { a: { interval: 2, nextReviewDate: '2026-09-20' } });
+});
+
 test('completing a lesson schedules its first spaced review', () => {
   const next = completeLesson(createInitialState(), 'what-is-indonesia', '2026-09-18');
   assert.deepEqual(next.reviews['what-is-indonesia'], { interval: 1, nextReviewDate: '2026-09-19' });
