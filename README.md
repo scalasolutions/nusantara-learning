@@ -11,6 +11,7 @@ A private, gamified Indonesia-learning companion. The first MVP is designed as a
 - Individual class pages with real Wikimedia Commons media and source credits
 - Curated institutional resources for every class
 - Learner profile, dashboard statistics, saved notes, and learning history
+- Spaced review queue with 1 → 3 → 7 → 14 → 30 day intervals
 - Browser reminder preferences and notification permission
 - Responsive UI for desktop and mobile
 

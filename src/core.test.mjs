@@ -4,9 +4,11 @@ import {
   calculateProgress,
   completeLesson,
   createInitialState,
+  getDueReviews,
   getNextLesson,
   markAnswer,
   normalizeState,
+  reviewLesson,
   shouldRemindToday,
 } from './core.js';
 
@@ -54,4 +56,26 @@ test('invalid persisted state is repaired safely', () => {
   assert.deepEqual(state.completedLessonIds, []);
   assert.equal(state.reminderEnabled, false);
   assert.equal(getNextLesson(state, [{ id: 'a' }]).id, 'a');
+});
+
+test('completing a lesson schedules its first spaced review', () => {
+  const next = completeLesson(createInitialState(), 'what-is-indonesia', '2026-09-18');
+  assert.deepEqual(next.reviews['what-is-indonesia'], { interval: 1, nextReviewDate: '2026-09-19' });
+  assert.deepEqual(getDueReviews(next, '2026-09-18'), []);
+  assert.deepEqual(getDueReviews(next, '2026-09-19'), ['what-is-indonesia']);
+});
+
+test('a remembered review advances its interval without adding completion XP', () => {
+  const completed = completeLesson(createInitialState(), 'what-is-indonesia', '2026-09-18');
+  const reviewed = reviewLesson(completed, 'what-is-indonesia', '2026-09-19', true);
+  assert.equal(reviewed.xp, 105);
+  assert.deepEqual(reviewed.reviews['what-is-indonesia'], { interval: 2, nextReviewDate: '2026-09-22' });
+  assert.equal(reviewed.history[0].xp, 100);
+});
+
+test('a missed review resets to a short interval and remains due today', () => {
+  const completed = completeLesson(createInitialState(), 'what-is-indonesia', '2026-09-18');
+  const reviewed = reviewLesson(completed, 'what-is-indonesia', '2026-09-20', false);
+  assert.deepEqual(reviewed.reviews['what-is-indonesia'], { interval: 0, nextReviewDate: '2026-09-21' });
+  assert.deepEqual(getDueReviews(reviewed, '2026-09-21'), ['what-is-indonesia']);
 });

@@ -1,5 +1,7 @@
 export const LESSON_XP = 100;
 export const ANSWER_XP = 10;
+export const REVIEW_XP = 5;
+export const REVIEW_INTERVALS = [0, 1, 3, 7, 14, 30];
 export const DEFAULT_LESSON_ORDER = [
   'what-is-indonesia',
   'map-of-indonesia',
@@ -22,6 +24,7 @@ export function createInitialState() {
     reminderTime: '20:00',
     notes: {},
     history: [],
+    reviews: {},
   };
 }
 
@@ -44,6 +47,9 @@ export function normalizeState(input = {}) {
       ? { name: typeof input.profile.name === 'string' ? input.profile.name : initial.profile.name, goal: typeof input.profile.goal === 'string' ? input.profile.goal : initial.profile.goal }
       : initial.profile,
     history: Array.isArray(input.history) ? input.history.filter((item) => item && typeof item.lessonId === 'string') : [],
+    reviews: input.reviews && typeof input.reviews === 'object' ? Object.fromEntries(
+      Object.entries(input.reviews).filter(([, review]) => review && Number.isInteger(review.interval) && typeof review.nextReviewDate === 'string'),
+    ) : {},
   };
 }
 
@@ -66,6 +72,7 @@ export function completeLesson(state, lessonId, today, lessons = DEFAULT_LESSON_
   }
   if (!alreadyComplete) {
     next.history = [{ lessonId, date: today, xp: LESSON_XP }, ...next.history.filter((item) => item.lessonId !== lessonId)].slice(0, 30);
+    next.reviews = { ...next.reviews, [lessonId]: { interval: 1, nextReviewDate: addDays(today, REVIEW_INTERVALS[1]) } };
   }
   if (next.lastStudyDate !== today) {
     next.streak = next.lastStudyDate ? next.streak + 1 : 1;
@@ -87,6 +94,30 @@ export function markAnswer(state, lessonId, correct) {
 
 export function shouldRemindToday(state, today) {
   return state.reminderEnabled === true && state.lastStudyDate !== today;
+}
+
+function addDays(dateString, days) {
+  const date = new Date(`${dateString}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+export function getDueReviews(state, today) {
+  const normalized = normalizeState(state);
+  return normalized.completedLessonIds.filter((lessonId) => normalized.reviews[lessonId]?.nextReviewDate <= today);
+}
+
+export function reviewLesson(state, lessonId, today, remembered) {
+  const next = normalizeState(state);
+  if (!next.completedLessonIds.includes(lessonId)) return next;
+  const prior = next.reviews[lessonId] || { interval: 0, nextReviewDate: today };
+  const interval = remembered ? Math.min(prior.interval + 1, REVIEW_INTERVALS.length - 1) : 0;
+  next.reviews = {
+    ...next.reviews,
+    [lessonId]: { interval, nextReviewDate: addDays(today, REVIEW_INTERVALS[Math.max(1, interval)]) },
+  };
+  if (remembered) next.xp += REVIEW_XP;
+  return next;
 }
 
 export function getToday(date = new Date()) {
