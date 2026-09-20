@@ -70,3 +70,7 @@ window.addEventListener('hashchange', render);
 if (!window.location.hash) window.location.hash = '#/';
 render();
 if (shouldRemindToday(state, getToday())) document.title = 'Nusantara Learning · Your class is waiting';
+
+if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+}
