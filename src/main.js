@@ -1,156 +1,69 @@
 import { LESSONS, REGIONS } from './content.js';
+import './resources.js';
 import {
-  calculateProgress,
-  completeLesson,
-  createInitialState,
-  getToday,
-  markAnswer,
-  normalizeState,
-  shouldRemindToday,
+  calculateProgress, completeLesson, createInitialState, getToday, markAnswer, normalizeState, shouldRemindToday,
 } from './core.js';
 import './styles.css';
 
 const STORAGE_KEY = 'nusantara-learning-state-v1';
 let state = loadState();
-let activeLessonId = state.currentLessonId;
 let answerState = null;
 
 function loadState() {
-  try {
-    return normalizeState(JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'));
-  } catch {
-    return createInitialState();
-  }
+  try { return normalizeState(JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')); } catch { return createInitialState(); }
 }
-
-function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function escapeHtml(value) { return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c])); }
+function getRoute() {
+  const parts = window.location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  if (parts[0] === 'dashboard') return { type: 'dashboard' };
+  if (parts[0] === 'class' && LESSONS.some((item) => item.id === parts[1])) return { type: 'class', id: parts[1] };
+  return { type: 'home' };
 }
-
-function lesson(id = activeLessonId) {
-  return LESSONS.find((item) => item.id === id) || LESSONS[0];
+function currentLesson() { return LESSONS.find((item) => item.id === state.currentLessonId) || LESSONS[0]; }
+function findLesson(id) { return LESSONS.find((item) => item.id === id) || LESSONS[0]; }
+function completed(id) { return state.completedLessonIds.includes(id); }
+function nav() { return `<nav class="app-nav"><a href="#/" class="nav-link">Learn</a><a href="#/dashboard" class="nav-link">My dashboard</a></nav>`; }
+function header() { return `<header class="topbar"><a class="brand" href="#/" aria-label="Nusantara Learning home"><span class="brand-mark">✦</span><span><strong>Nusantara</strong><small>Learning journey</small></span></a><div class="top-actions">${nav()}<span class="stat-pill streak">🔥 <b>${state.streak}</b></span><span class="stat-pill xp">✦ <b>${state.xp}</b> XP</span><a href="#/dashboard" class="avatar" aria-label="Open profile">${escapeHtml((state.profile.name || 'FY').slice(0, 2).toUpperCase())}</a></div></header>`; }
+function progressBar() { const progress = calculateProgress(state, LESSONS.length); return `<div class="progress-block"><div class="progress-label"><span>Course progress</span><strong>${progress}%</strong></div><div class="progress-track"><span style="width:${progress}%"></span></div><small>${state.completedLessonIds.length} of ${LESSONS.length} classes complete</small></div>`; }
+function lessonList() { return `<nav class="lesson-nav" aria-label="Course classes">${LESSONS.map((item) => `<a class="lesson-nav-item ${item.id === state.currentLessonId ? 'active' : ''} ${completed(item.id) ? 'done' : ''}" href="#/class/${item.id}"><span class="lesson-number">${completed(item.id) ? '✓' : item.number}</span><span><b>${escapeHtml(item.title)}</b><small>${escapeHtml(item.tag)} · ${item.duration}</small></span></a>`).join('')}</nav>`; }
+function sidebar() { return `<aside class="sidebar"><div class="sidebar-intro"><span class="eyebrow">INDONESIA 101</span><h1>Understand the archipelago, one story at a time.</h1><p>Build the map first. Then let history, people, belief, and everyday life connect.</p></div>${progressBar()}${lessonList()}<a class="settings-link" href="#/dashboard">⌁ View profile & history</a></aside>`; }
+function shell(body, showSidebar = true) { return `<div class="shell">${header()}<main class="layout ${showSidebar ? '' : 'full-layout'}">${showSidebar ? sidebar() : ''}<section class="content">${body}</section></main><footer><span>Built for a lifelong Indonesia 101 → 201 journey.</span><span>Progress stays on this device.</span></footer></div>`; }
+function hero(item) { return `<section class="hero-card" style="--accent:${item.color}"><div class="hero-copy"><div class="eyebrow">CLASS ${item.number} · ${escapeHtml(item.region.toUpperCase())}</div><h2>${escapeHtml(item.title)}</h2><p class="hero-subtitle">${escapeHtml(item.subtitle)}</p><div class="hero-meta"><span>◷ ${item.duration}</span><span>✦ ${item.xp} XP</span><span>▣ ${item.tag}</span></div><a class="primary-button" href="#class-content">${completed(item.id) ? 'Review class' : 'Start class'} <span>→</span></a></div><div class="hero-orbit" aria-hidden="true"><div class="orbit-line"></div><div class="island-shape island-a"></div><div class="island-shape island-b"></div><div class="island-shape island-c"></div><span>INDONESIA</span></div></section>`; }
+function media(item) { return `<figure class="lesson-media"><img src="${item.media.image}" alt="${escapeHtml(item.media.imageAlt)}" loading="lazy"/><figcaption>${escapeHtml(item.media.credit)} · <a href="${item.media.creditUrl}" target="_blank" rel="noreferrer">source and license</a></figcaption></figure>`; }
+function resources(item) { return `<section class="resources-section"><div class="section-heading compact"><div><span class="eyebrow">GO FURTHER</span><h2>Resources for this class</h2></div><span class="section-note">Read, watch, and explore</span></div><div class="resource-grid">${item.resources.map(([kind, title, url, description]) => `<a class="resource-card" href="${url}" target="_blank" rel="noreferrer"><span class="resource-kind">${escapeHtml(kind)}</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p><span class="resource-arrow">Open resource ↗</span></a>`).join('')}</div></section>`; }
+function quiz(item) { return `<div class="quiz-card" id="quiz-card"><div class="quiz-heading"><span class="quiz-icon">?</span><div><span class="eyebrow">CHECK YOUR MAP</span><h3>${escapeHtml(item.question)}</h3></div></div><div class="answers">${item.answers.map((answer, index) => `<button class="answer-button" data-answer="${index}">${String.fromCharCode(65 + index)} <span>${escapeHtml(answer)}</span></button>`).join('')}</div><div class="quiz-result" aria-live="polite"></div></div>`; }
+function classPage(id) {
+  const item = findLesson(id);
+  return shell(`<div class="class-header"><a href="#/" class="back-link">← All classes</a><span class="class-progress-label">${completed(item.id) ? 'Completed class' : 'Class in progress'}</span></div>${hero(item)}<section class="class-grid" id="class-content"><div><div class="story-card"><p>${escapeHtml(item.story)}</p></div><div class="fact-grid">${item.facts.map(([label, text]) => `<article><span class="fact-label ${label.toLowerCase().replace(/ /g, '-')}">${escapeHtml(label)}</span><p>${escapeHtml(text)}</p></article>`).join('')}</div><div class="vocab-section"><div class="subheading"><h3>Words to carry with you</h3><span>5 new words</span></div><div class="vocab-grid">${item.vocabulary.map(([word, meaning]) => `<div><strong>${escapeHtml(word)}</strong><span>${escapeHtml(meaning)}</span></div>`).join('')}</div></div>${quiz(item)}<div class="lesson-actions"><button class="primary-button" data-action="complete">${completed(item.id) ? 'Completed ✓' : 'Complete class'} <span>+${item.xp} XP</span></button><textarea data-note placeholder="Add a note for your future self...">${escapeHtml(state.notes[item.id] || '')}</textarea></div></div><div>${media(item)}<div class="class-side-card"><span class="eyebrow">YOUR NOTES</span><h3>Make this idea yours.</h3><p>Your note is saved on this device and appears in your dashboard history.</p></div></div></section>${resources(item)}`, true);
 }
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character]));
+function homePage() {
+  const item = currentLesson();
+  return shell(`<section class="welcome-strip"><div><span class="eyebrow">WELCOME BACK, ${escapeHtml(state.profile.name.toUpperCase())}</span><h2>Ready to keep exploring?</h2></div><a href="#/dashboard" class="text-button">View my history →</a></section>${hero(item)}<section class="continue-card"><div class="continue-icon">▶</div><div><span class="eyebrow">PICK UP WHERE YOU LEFT OFF</span><h3>${escapeHtml(item.title)}</h3><p>${state.lastStudyDate ? `Last studied ${state.lastStudyDate}` : 'Your first expedition starts here.'}</p></div><a class="text-button" href="#/class/${item.id}">Continue <span>→</span></a></section><section class="section-heading"><div><span class="eyebrow">EXPLORE THE ARCHIPELAGO</span><h2>Indonesia is many worlds</h2></div><span class="section-note">Seven regions · one shared journey</span></section><section class="region-grid">${REGIONS.map((region) => `<article class="region-card" style="--region:${region.color}"><div class="region-art"><span>${region.id === 'bali-nusa' ? '◒' : region.id === 'papua' ? '✺' : '◇'}</span></div><div><h3>${escapeHtml(region.name)}</h3><p>${escapeHtml(region.note)}</p><span class="locked-label">${region.id === 'java' ? 'AVAILABLE NEXT' : 'UNLOCK AS YOU LEARN'}</span></div></article>`).join('')}</section><section class="reminder-card" id="reminder"><div class="reminder-icon">🔔</div><div class="reminder-copy"><span class="eyebrow">KEEP THE THREAD</span><h2>Make Indonesia part of your rhythm.</h2><p>Set a gentle reminder so the app remembers where you left off.</p><div class="reminder-controls"><label><input type="checkbox" data-reminder-toggle ${state.reminderEnabled ? 'checked' : ''}/> Remind me</label><input type="time" data-reminder-time value="${state.reminderTime}" ${state.reminderEnabled ? '' : 'disabled'}/><button class="secondary-button" data-action="notifications">Enable browser notifications</button></div><small class="reminder-status">${state.reminderEnabled ? `Next reminder at ${state.reminderTime}` : 'Reminders are currently off.'}</small></div></section>`, true);
 }
-
-function render() {
-  const current = lesson();
+function dashboardPage() {
   const progress = calculateProgress(state, LESSONS.length);
-  const completed = new Set(state.completedLessonIds);
-  const reviewCount = Object.keys(state.quizBest).length;
-  document.querySelector('#app').innerHTML = `
-    <div class="shell">
-      <header class="topbar">
-        <a class="brand" href="#top" aria-label="Nusantara Learning home">
-          <span class="brand-mark">✦</span>
-          <span><strong>Nusantara</strong><small>Learning journey</small></span>
-        </a>
-        <div class="top-stats" aria-label="Learning statistics">
-          <span class="stat-pill streak">🔥 <b>${state.streak}</b> day streak</span>
-          <span class="stat-pill xp">✦ <b>${state.xp}</b> XP</span>
-          <span class="avatar">FY</span>
-        </div>
-      </header>
-
-      <main id="top" class="layout">
-        <aside class="sidebar">
-          <div class="sidebar-intro">
-            <span class="eyebrow">INDONESIA 101</span>
-            <h1>Understand the archipelago, one story at a time.</h1>
-            <p>Build the map first. Then let history, people, belief, and everyday life connect.</p>
-          </div>
-          <div class="progress-block">
-            <div class="progress-label"><span>Your journey</span><strong>${progress}%</strong></div>
-            <div class="progress-track"><span style="width:${progress}%"></span></div>
-            <small>${completed.size} of ${LESSONS.length} foundations complete</small>
-          </div>
-          <nav class="lesson-nav" aria-label="Course lessons">
-            ${LESSONS.map((item) => `
-              <button class="lesson-nav-item ${item.id === current.id ? 'active' : ''} ${completed.has(item.id) ? 'done' : ''}" data-lesson="${item.id}">
-                <span class="lesson-number">${completed.has(item.id) ? '✓' : item.number}</span>
-                <span><b>${escapeHtml(item.title)}</b><small>${escapeHtml(item.tag)} · ${item.duration}</small></span>
-              </button>`).join('')}
-          </nav>
-          <button class="settings-link" data-scroll="reminder">⚙ Reminder settings</button>
-        </aside>
-
-        <section class="content">
-          <section class="hero-card" style="--accent:${current.color}">
-            <div class="hero-copy">
-              <div class="eyebrow">EPISODE ${current.number} · ${escapeHtml(current.region.toUpperCase())}</div>
-              <h2>${escapeHtml(current.title)}</h2>
-              <p class="hero-subtitle">${escapeHtml(current.subtitle)}</p>
-              <div class="hero-meta"><span>◷ ${current.duration}</span><span>✦ ${current.xp} XP</span><span>▣ ${current.tag}</span></div>
-              <button class="primary-button" data-action="start">${completed.has(current.id) ? 'Review episode' : 'Start episode'} <span>→</span></button>
-            </div>
-            <div class="hero-orbit" aria-hidden="true"><div class="orbit-line"></div><div class="island-shape island-a"></div><div class="island-shape island-b"></div><div class="island-shape island-c"></div><span>INDONESIA</span></div>
-          </section>
-
-          <section class="continue-card">
-            <div class="continue-icon">▶</div>
-            <div><span class="eyebrow">PICK UP WHERE YOU LEFT OFF</span><h3>${escapeHtml(current.title)}</h3><p>${state.lastStudyDate ? `Last studied ${state.lastStudyDate}` : 'Your first expedition starts here.'}</p></div>
-            <button class="text-button" data-action="start">Continue <span>→</span></button>
-          </section>
-
-          <section class="section-heading"><div><span class="eyebrow">EXPLORE THE ARCHIPELAGO</span><h2>Indonesia is many worlds</h2></div><span class="section-note">Seven regions · one shared journey</span></section>
-          <section class="region-grid">${REGIONS.map((region) => `<article class="region-card" style="--region:${region.color}"><div class="region-art"><span>${region.name === 'Bali & Nusa Tenggara' ? '◒' : region.name === 'Papua' ? '✺' : '◇'}</span></div><div><h3>${escapeHtml(region.name)}</h3><p>${escapeHtml(region.note)}</p><span class="locked-label">${region.id === 'java' ? 'AVAILABLE NEXT' : 'UNLOCK AS YOU LEARN'}</span></div></article>`).join('')}</section>
-
-          <section class="lesson-panel" id="lesson-panel">
-            <div class="section-heading compact"><div><span class="eyebrow">TODAY'S LESSON</span><h2>${escapeHtml(current.title)}</h2></div><span class="lesson-status">${completed.has(current.id) ? 'COMPLETED' : 'READY'}</span></div>
-            <div class="story-card"><p>${escapeHtml(current.story)}</p></div>
-            <div class="fact-grid">${current.facts.map(([label, text]) => `<article><span class="fact-label ${label.toLowerCase().replace(/ /g, '-')}">${escapeHtml(label)}</span><p>${escapeHtml(text)}</p></article>`).join('')}</div>
-            <div class="vocab-section"><div class="subheading"><h3>Words to carry with you</h3><span>5 new words</span></div><div class="vocab-grid">${current.vocabulary.map(([word, meaning]) => `<div><strong>${escapeHtml(word)}</strong><span>${escapeHtml(meaning)}</span></div>`).join('')}</div></div>
-            <div class="quiz-card" id="quiz-card"><div class="quiz-heading"><span class="quiz-icon">?</span><div><span class="eyebrow">CHECK YOUR MAP</span><h3>${escapeHtml(current.question)}</h3></div></div><div class="answers">${current.answers.map((answer, index) => `<button class="answer-button" data-answer="${index}">${String.fromCharCode(65 + index)} <span>${escapeHtml(answer)}</span></button>`).join('')}</div><div class="quiz-result" aria-live="polite"></div></div>
-            <div class="lesson-actions"><button class="primary-button" data-action="complete">${completed.has(current.id) ? 'Completed ✓' : 'Complete episode'} <span>+${current.xp} XP</span></button><textarea data-note placeholder="Add a note for your future self...">${escapeHtml(state.notes[current.id] || '')}</textarea></div>
-          </section>
-
-          <section class="reminder-card" id="reminder">
-            <div class="reminder-icon">🔔</div><div class="reminder-copy"><span class="eyebrow">KEEP THE THREAD</span><h2>Make Indonesia part of your rhythm.</h2><p>Set a gentle reminder so the app remembers where you left off.</p><div class="reminder-controls"><label><input type="checkbox" data-reminder-toggle ${state.reminderEnabled ? 'checked' : ''}/> Remind me</label><input type="time" data-reminder-time value="${state.reminderTime}" ${state.reminderEnabled ? '' : 'disabled'}/><button class="secondary-button" data-action="notifications">Enable browser notifications</button></div><small class="reminder-status">${state.reminderEnabled ? `Next reminder at ${state.reminderTime}` : 'Reminders are currently off.'}</small></div>
-          </section>
-        </section>
-      </main>
-      <footer><span>Built for a lifelong Indonesia 101 → 201 journey.</span><span>Progress stays on this device.</span></footer>
-    </div>`;
-  bindEvents();
+  const history = state.history.map((entry) => { const item = findLesson(entry.lessonId); return `<a href="#/class/${item.id}" class="history-row"><span class="history-dot">✓</span><span><b>${escapeHtml(item.title)}</b><small>${entry.date} · ${entry.xp ? `+${entry.xp} XP` : 'reviewed'}</small></span><span>→</span></a>`; }).join('') || '<p class="empty-state">Your completed classes will appear here.</p>';
+  return shell(`<section class="dashboard-hero"><div class="profile-avatar">${escapeHtml((state.profile.name || 'FY').slice(0, 2).toUpperCase())}</div><div><span class="eyebrow">YOUR LEARNING PROFILE</span><h2>${escapeHtml(state.profile.name)}</h2><p>${escapeHtml(state.profile.goal)}</p></div><div class="dashboard-score"><strong>${state.xp}</strong><span>total XP</span></div></section><section class="dashboard-stats"><article><strong>${state.streak}</strong><span>day streak</span></article><article><strong>${state.completedLessonIds.length}/${LESSONS.length}</strong><span>classes complete</span></article><article><strong>${progress}%</strong><span>course progress</span></article><article><strong>${Object.keys(state.quizBest).length}</strong><span>quiz wins</span></article></section><section class="dashboard-columns"><div class="dashboard-panel"><div class="section-heading compact"><div><span class="eyebrow">LEARNING HISTORY</span><h2>Your path so far</h2></div></div><div class="history-list">${history}</div></div><div class="dashboard-panel profile-panel"><span class="eyebrow">PROFILE SETTINGS</span><h2>Shape your journey</h2><label>Name<input data-profile-name value="${escapeHtml(state.profile.name)}"/></label><label>Learning goal<textarea data-profile-goal>${escapeHtml(state.profile.goal)}</textarea></label><button class="secondary-button" data-action="save-profile">Save profile</button><div class="dashboard-reminder"><b>Reminder</b><span>${state.reminderEnabled ? `On at ${state.reminderTime}` : 'Off'}</span><a href="#/" data-scroll="reminder">Change on home →</a></div></div></section>`, false);
 }
-
-function bindEvents() {
-  document.querySelectorAll('[data-lesson]').forEach((button) => button.addEventListener('click', () => { activeLessonId = button.dataset.lesson; state.currentLessonId = activeLessonId; saveState(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
-  document.querySelectorAll('[data-action="start"]').forEach((button) => button.addEventListener('click', () => document.querySelector('#lesson-panel').scrollIntoView({ behavior: 'smooth', block: 'start' })));
-  document.querySelector('[data-action="complete"]').addEventListener('click', () => {
-    state = completeLesson(state, activeLessonId, getToday(), LESSONS);
-    activeLessonId = state.currentLessonId;
-    saveState();
-    render();
-    document.querySelector('#lesson-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-  document.querySelectorAll('[data-answer]').forEach((button) => button.addEventListener('click', () => answerQuiz(Number(button.dataset.answer))));
-  document.querySelector('[data-note]').addEventListener('input', (event) => { state.notes[activeLessonId] = event.target.value; saveState(); });
-  document.querySelector('[data-reminder-toggle]').addEventListener('change', (event) => { state.reminderEnabled = event.target.checked; saveState(); render(); });
-  document.querySelector('[data-reminder-time]').addEventListener('change', (event) => { state.reminderTime = event.target.value; saveState(); render(); });
-  document.querySelector('[data-action="notifications"]').addEventListener('click', enableNotifications);
-  document.querySelector('[data-scroll="reminder"]').addEventListener('click', () => document.querySelector('#reminder').scrollIntoView({ behavior: 'smooth' }));
+function render() {
+  const route = getRoute();
+  document.querySelector('#app').innerHTML = route.type === 'dashboard' ? dashboardPage() : route.type === 'class' ? classPage(route.id) : homePage();
+  bindEvents(route);
 }
-
-function answerQuiz(index) {
-  const current = lesson();
-  const result = document.querySelector('.quiz-result');
-  const buttons = document.querySelectorAll('[data-answer]');
-  const correct = index === current.correct;
-  state = markAnswer(state, current.id, correct);
-  saveState();
-  buttons.forEach((button, buttonIndex) => { button.disabled = true; if (buttonIndex === current.correct) button.classList.add('correct'); if (buttonIndex === index && !correct) button.classList.add('wrong'); });
-  result.textContent = correct ? 'Correct — +10 XP. You found the thread.' : `Not quite. The answer is ${String.fromCharCode(65 + current.correct)}. Keep the idea, not just the letter.`;
-  result.className = `quiz-result ${correct ? 'success' : 'retry'}`;
+function bindEvents(route) {
+  const completeButton = document.querySelector('[data-action="complete"]');
+  if (completeButton) completeButton.addEventListener('click', () => { state = completeLesson(state, route.id, getToday(), LESSONS); saveState(); render(); document.querySelector('#class-content')?.scrollIntoView({ behavior: 'smooth' }); });
+  document.querySelectorAll('[data-answer]').forEach((button) => button.addEventListener('click', () => { const item = findLesson(route.id); const index = Number(button.dataset.answer); const correct = index === item.correct; state = markAnswer(state, item.id, correct); saveState(); document.querySelectorAll('[data-answer]').forEach((b, i) => { b.disabled = true; if (i === item.correct) b.classList.add('correct'); if (i === index && !correct) b.classList.add('wrong'); }); const result = document.querySelector('.quiz-result'); result.textContent = correct ? 'Correct — +10 XP. You found the thread.' : `Not quite. The answer is ${String.fromCharCode(65 + item.correct)}.`; result.className = `quiz-result ${correct ? 'success' : 'retry'}`; }));
+  document.querySelector('[data-note]')?.addEventListener('input', (event) => { state.notes[route.id] = event.target.value; saveState(); });
+  document.querySelector('[data-reminder-toggle]')?.addEventListener('change', (event) => { state.reminderEnabled = event.target.checked; saveState(); render(); });
+  document.querySelector('[data-reminder-time]')?.addEventListener('change', (event) => { state.reminderTime = event.target.value; saveState(); render(); });
+  document.querySelector('[data-action="notifications"]')?.addEventListener('click', enableNotifications);
+  document.querySelector('[data-action="save-profile"]')?.addEventListener('click', () => { state.profile.name = document.querySelector('[data-profile-name]').value.trim() || 'Learner'; state.profile.goal = document.querySelector('[data-profile-goal]').value.trim() || 'Understand Indonesia region by region'; saveState(); render(); });
+  document.querySelector('[data-scroll="reminder"]')?.addEventListener('click', () => { window.location.hash = '#/'; setTimeout(() => document.querySelector('#reminder')?.scrollIntoView({ behavior: 'smooth' }), 50); });
 }
-
-async function enableNotifications() {
-  if (!('Notification' in window)) { alert('Browser notifications are not supported here. The in-app reminder preference is still saved.'); return; }
-  const permission = await Notification.requestPermission();
-  if (permission === 'granted') new Notification('Nusantara Learning', { body: `Your next Indonesia lesson is: ${lesson().title}` });
-}
-
+async function enableNotifications() { if (!('Notification' in window)) { alert('Browser notifications are not supported here.'); return; } const permission = await Notification.requestPermission(); if (permission === 'granted') new Notification('Nusantara Learning', { body: `Your next Indonesia class is: ${currentLesson().title}` }); }
+window.addEventListener('hashchange', render);
+if (!window.location.hash) window.location.hash = '#/';
 render();
-if (shouldRemindToday(state, getToday())) document.title = 'Nusantara Learning · Your lesson is waiting';
+if (shouldRemindToday(state, getToday())) document.title = 'Nusantara Learning · Your class is waiting';

@@ -11,6 +11,7 @@ export const DEFAULT_LESSON_ORDER = [
 
 export function createInitialState() {
   return {
+    profile: { name: 'Fredrick', goal: 'Understand Indonesia region by region' },
     currentLessonId: 'what-is-indonesia',
     completedLessonIds: [],
     xp: 0,
@@ -20,6 +21,7 @@ export function createInitialState() {
     reminderEnabled: false,
     reminderTime: '20:00',
     notes: {},
+    history: [],
   };
 }
 
@@ -38,6 +40,10 @@ export function normalizeState(input = {}) {
     reminderEnabled: input.reminderEnabled === true,
     reminderTime: typeof input.reminderTime === 'string' ? input.reminderTime : initial.reminderTime,
     notes: input.notes && typeof input.notes === 'object' ? input.notes : {},
+    profile: input.profile && typeof input.profile === 'object'
+      ? { name: typeof input.profile.name === 'string' ? input.profile.name : initial.profile.name, goal: typeof input.profile.goal === 'string' ? input.profile.goal : initial.profile.goal }
+      : initial.profile,
+    history: Array.isArray(input.history) ? input.history.filter((item) => item && typeof item.lessonId === 'string') : [],
   };
 }
 
@@ -57,6 +63,9 @@ export function completeLesson(state, lessonId, today, lessons = DEFAULT_LESSON_
   if (!alreadyComplete) {
     next.completedLessonIds = [...next.completedLessonIds, lessonId];
     next.xp += LESSON_XP;
+  }
+  if (!alreadyComplete) {
+    next.history = [{ lessonId, date: today, xp: LESSON_XP }, ...next.history.filter((item) => item.lessonId !== lessonId)].slice(0, 30);
   }
   if (next.lastStudyDate !== today) {
     next.streak = next.lastStudyDate ? next.streak + 1 : 1;

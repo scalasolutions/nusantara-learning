@@ -15,6 +15,8 @@ test('new learners start at lesson one with zero XP', () => {
   assert.equal(state.currentLessonId, 'what-is-indonesia');
   assert.equal(state.xp, 0);
   assert.deepEqual(state.completedLessonIds, []);
+  assert.equal(state.profile.name, 'Fredrick');
+  assert.deepEqual(state.history, []);
 });
 
 test('completing a lesson awards XP once and advances to the next lesson', () => {
@@ -23,6 +25,7 @@ test('completing a lesson awards XP once and advances to the next lesson', () =>
   assert.equal(next.xp, 100);
   assert.deepEqual(next.completedLessonIds, ['what-is-indonesia']);
   assert.equal(next.currentLessonId, 'map-of-indonesia');
+  assert.deepEqual(next.history, [{ lessonId: 'what-is-indonesia', date: '2026-09-18', xp: 100 }]);
   assert.equal(completeLesson(next, 'what-is-indonesia', '2026-09-18').xp, 100);
 });
 

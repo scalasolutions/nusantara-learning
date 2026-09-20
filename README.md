@@ -8,6 +8,9 @@ A private, gamified Indonesia-learning companion. The first MVP is designed as a
 - XP, streaks, lesson completion, and quiz rewards
 - Resume exactly where you left off
 - Region explorer cards
+- Individual class pages with real Wikimedia Commons media and source credits
+- Curated institutional resources for every class
+- Learner profile, dashboard statistics, saved notes, and learning history
 - Browser reminder preferences and notification permission
 - Responsive UI for desktop and mobile
 
