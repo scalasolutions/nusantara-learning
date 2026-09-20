@@ -42,6 +42,9 @@ function homePage() {
   const item = currentLesson();
   return shell(`<section class="welcome-strip"><div><span class="eyebrow">WELCOME BACK, ${escapeHtml(state.profile.name.toUpperCase())}</span><h2>Ready to keep exploring?</h2></div><a href="#/dashboard" class="text-button">View my history →</a></section>${hero(item)}<section class="continue-card"><div class="continue-icon">▶</div><div><span class="eyebrow">PICK UP WHERE YOU LEFT OFF</span><h3>${escapeHtml(item.title)}</h3><p>${state.lastStudyDate ? `Last studied ${state.lastStudyDate}` : 'Your first expedition starts here.'}</p></div><a class="text-button" href="#/class/${item.id}">Continue <span>→</span></a></section><section class="section-heading"><div><span class="eyebrow">EXPLORE THE ARCHIPELAGO</span><h2>Indonesia is many worlds</h2></div><span class="section-note">Seven regions · one shared journey</span></section><section class="region-grid">${REGIONS.map((region) => `<article class="region-card" style="--region:${region.color}"><div class="region-art"><span>${region.id === 'bali-nusa' ? '◒' : region.id === 'papua' ? '✺' : '◇'}</span></div><div><h3>${escapeHtml(region.name)}</h3><p>${escapeHtml(region.note)}</p><span class="locked-label">${region.id === 'java' ? 'AVAILABLE NEXT' : 'UNLOCK AS YOU LEARN'}</span></div></article>`).join('')}</section><section class="reminder-card" id="reminder"><div class="reminder-icon">🔔</div><div class="reminder-copy"><span class="eyebrow">KEEP THE THREAD</span><h2>Make Indonesia part of your rhythm.</h2><p>Set a gentle reminder so the app remembers where you left off.</p><div class="reminder-controls"><label><input type="checkbox" data-reminder-toggle ${state.reminderEnabled ? 'checked' : ''}/> Remind me</label><input type="time" data-reminder-time value="${state.reminderTime}" ${state.reminderEnabled ? '' : 'disabled'}/><button class="secondary-button" data-action="notifications">Enable browser notifications</button></div><small class="reminder-status">${state.reminderEnabled ? `Next reminder at ${state.reminderTime}` : 'Reminders are currently off.'}</small></div></section>`, true);
 }
+function onboardingPage() {
+  return `<main class="onboarding-page"><div class="onboarding-mark">✦</div><span class="eyebrow">NUSANTARA LEARNING</span><h1>Understand Indonesia, one connected story at a time.</h1><p class="onboarding-lede">A thoughtful Indonesia 101 journey that starts with the map, then connects history, people, belief, and everyday life.</p><div class="onboarding-points"><span>◈ Six guided classes</span><span>◷ 12–20 minute lessons</span><span>✦ Progress saved on this device</span></div><form class="onboarding-form" data-onboarding-form><label>What should we call you?<input name="name" value="${escapeHtml(state.profile.name === 'Fredrick' ? '' : state.profile.name)}" placeholder="Your name" autocomplete="name" required/></label><label>What are you hoping to understand?<textarea name="goal" placeholder="For example: the people and history behind the places I visit">${escapeHtml(state.profile.goal === 'Understand Indonesia region by region' ? '' : state.profile.goal)}</textarea></label><button class="primary-button" type="submit">Begin your journey <span>→</span></button></form><small class="onboarding-note">Private by design · no account or payment required</small></main>`;
+}
 function dashboardPage() {
   const progress = calculateProgress(state, LESSONS.length);
   const history = state.history.map((entry) => { const item = findLesson(entry.lessonId); return `<a href="#/class/${item.id}" class="history-row"><span class="history-dot">✓</span><span><b>${escapeHtml(item.title)}</b><small>${entry.date} · ${entry.xp ? `+${entry.xp} XP` : 'reviewed'}</small></span><span>→</span></a>`; }).join('') || '<p class="empty-state">Your completed classes will appear here.</p>';
@@ -51,10 +54,22 @@ function dashboardPage() {
 }
 function render() {
   const route = getRoute();
-  document.querySelector('#app').innerHTML = route.type === 'dashboard' ? dashboardPage() : route.type === 'class' ? classPage(route.id) : homePage();
+  document.querySelector('#app').innerHTML = !state.onboardingCompleted
+    ? onboardingPage()
+    : route.type === 'dashboard' ? dashboardPage() : route.type === 'class' ? classPage(route.id) : homePage();
   bindEvents(route);
 }
 function bindEvents(route) {
+  document.querySelector('[data-onboarding-form]')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const name = form.elements.name.value.trim();
+    const goal = form.elements.goal.value.trim() || 'Understand Indonesia region by region';
+    if (!name) return;
+    state = normalizeState({ ...state, profile: { name, goal }, onboardingCompleted: true });
+    saveState();
+    render();
+  });
   const completeButton = document.querySelector('[data-action="complete"]');
   if (completeButton) completeButton.addEventListener('click', () => { state = completeLesson(state, route.id, getToday(), LESSONS); saveState(); render(); document.querySelector('#class-content')?.scrollIntoView({ behavior: 'smooth' }); });
   document.querySelectorAll('[data-answer]').forEach((button) => button.addEventListener('click', () => { const item = findLesson(route.id); const index = Number(button.dataset.answer); const correct = index === item.correct; state = markAnswer(state, item.id, correct); saveState(); document.querySelectorAll('[data-answer]').forEach((b, i) => { b.disabled = true; if (i === item.correct) b.classList.add('correct'); if (i === index && !correct) b.classList.add('wrong'); }); const result = document.querySelector('.quiz-result'); result.textContent = correct ? 'Correct — +10 XP. You found the thread.' : `Not quite. The answer is ${String.fromCharCode(65 + item.correct)}.`; result.className = `quiz-result ${correct ? 'success' : 'retry'}`; }));

@@ -1,4 +1,7 @@
-# Overnight build log
+## 2026-09-21 05:56 WIB
+- Added first-run onboarding with a clear Indonesia-learning value proposition, learner name and goal capture, and local persistence. Fresh profiles now see onboarding before the course shell; existing profiles with activity are automatically treated as onboarded, preserving legacy progress and storage compatibility.
+- Verification: focused RED test failed before implementation as expected; then `npm test` (13 passing), `npm run build` (Vite production build passed), `git diff --check` (passed), and live Vite HTTP smoke checks confirmed the app shell, manifest, and onboarding form/module wiring. Full interactive browser verification was unavailable because Chrome/Chromium and Playwright are not installed in this environment.
+- Remaining risks: onboarding/profile/progress remain device-local; browser notifications are best-effort and do not guarantee delivery while the app is closed; no cloud sync, auth, payments, or reliable external scheduler is included.
 
 ## 2026-09-21 03:14 WIB
 - Added backward-compatible spaced review state and pure scheduling transitions: first review after 1 day, then 3/7/14/30-day intervals; remembered reviews award +5 XP, missed reviews reset to tomorrow.

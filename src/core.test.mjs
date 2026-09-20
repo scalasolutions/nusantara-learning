@@ -28,6 +28,12 @@ test('new learners start at lesson one with zero XP', () => {
   assert.deepEqual(state.completedLessonIds, []);
   assert.equal(state.profile.name, 'Fredrick');
   assert.deepEqual(state.history, []);
+  assert.equal(state.onboardingCompleted, false);
+});
+
+test('legacy learners with activity skip the new onboarding screen', () => {
+  const state = normalizeState({ xp: 100, completedLessonIds: ['what-is-indonesia'] });
+  assert.equal(state.onboardingCompleted, true);
 });
 
 test('completing a lesson awards XP once and advances to the next lesson', () => {

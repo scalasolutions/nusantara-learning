@@ -14,6 +14,7 @@ export const DEFAULT_LESSON_ORDER = [
 export function createInitialState() {
   return {
     profile: { name: 'Fredrick', goal: 'Understand Indonesia region by region' },
+    onboardingCompleted: false,
     currentLessonId: 'what-is-indonesia',
     completedLessonIds: [],
     xp: 0,
@@ -30,9 +31,14 @@ export function createInitialState() {
 
 export function normalizeState(input = {}) {
   const initial = createInitialState();
+  const hasLegacyActivity = input.xp > 0
+    || (Array.isArray(input.completedLessonIds) && input.completedLessonIds.length > 0)
+    || (Array.isArray(input.history) && input.history.length > 0)
+    || typeof input.lastStudyDate === 'string';
   return {
     ...initial,
     ...input,
+    onboardingCompleted: input.onboardingCompleted === true || (input.onboardingCompleted === undefined && hasLegacyActivity),
     currentLessonId: typeof input.currentLessonId === 'string' ? input.currentLessonId : initial.currentLessonId,
     completedLessonIds: Array.isArray(input.completedLessonIds)
       ? input.completedLessonIds.filter((id) => typeof id === 'string')
