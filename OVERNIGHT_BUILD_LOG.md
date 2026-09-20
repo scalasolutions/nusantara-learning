@@ -15,3 +15,8 @@
 - Made quiz XP rewards idempotent: a correct answer awards the +10 XP milestone only once per lesson, preventing reload/retry farming while preserving existing `quizBest` state and completion/review rewards.
 - Verification: focused RED test failed with 20 XP as expected, then `npm test` (10 passing), `npm run build` (Vite production build passed), and `git diff --check` (passed). Chrome headless rendered the class route from the local dev server (28,182-byte DOM containing the quiz and lesson content); manifest and service worker endpoints also returned successfully.
 - Remaining risks: quiz state stores a one-time completion marker rather than detailed attempt history; progress, reminders, and review state remain device-local. Browser notifications are best-effort and do not guarantee delivery while the app is closed.
+
+## 2026-09-21 04:51 WIB
+- Fixed streak integrity: a study day now extends the streak only when it follows the previous study date immediately; studying after a gap correctly starts a new one-day streak. Added a regression test while preserving all existing state fields and XP behavior.
+- Verification: focused RED test failed with streak 3 instead of 1, then passed after the fix; `npm test` (11 passing), `npm run build` (Vite production build passed), `git diff --check` (passed), and local HTTP smoke checks returned the app shell, manifest, and service worker successfully from Vite.
+- Remaining risks: automated browser tooling is not installed in this repo, so this cycle used local HTTP smoke verification rather than a full interactive browser session. Progress, reminders, and review state remain device-local; browser notifications are best-effort and do not guarantee delivery while the app is closed.

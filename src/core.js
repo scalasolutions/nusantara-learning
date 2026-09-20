@@ -75,7 +75,7 @@ export function completeLesson(state, lessonId, today, lessons = DEFAULT_LESSON_
     next.reviews = { ...next.reviews, [lessonId]: { interval: 1, nextReviewDate: addDays(today, REVIEW_INTERVALS[1]) } };
   }
   if (next.lastStudyDate !== today) {
-    next.streak = next.lastStudyDate ? next.streak + 1 : 1;
+    next.streak = next.lastStudyDate === addDays(today, -1) ? next.streak + 1 : 1;
     next.lastStudyDate = today;
   }
   const nextLesson = lessons.length ? getNextLesson(next, lessons) : null;

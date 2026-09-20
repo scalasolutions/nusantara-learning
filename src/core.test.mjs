@@ -73,6 +73,14 @@ test('completing a lesson schedules its first spaced review', () => {
   assert.deepEqual(getDueReviews(next, '2026-09-19'), ['what-is-indonesia']);
 });
 
+test('streak continues only on the immediately following study day', () => {
+  const first = completeLesson(createInitialState(), 'what-is-indonesia', '2026-09-18');
+  const consecutive = completeLesson(first, 'map-of-indonesia', '2026-09-19');
+  const afterGap = completeLesson(consecutive, 'peoples-and-languages', '2026-09-21');
+  assert.equal(consecutive.streak, 2);
+  assert.equal(afterGap.streak, 1);
+});
+
 test('a remembered review advances its interval without adding completion XP', () => {
   const completed = completeLesson(createInitialState(), 'what-is-indonesia', '2026-09-18');
   const reviewed = reviewLesson(completed, 'what-is-indonesia', '2026-09-19', true);
