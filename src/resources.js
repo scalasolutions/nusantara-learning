@@ -71,4 +71,37 @@ const RESOURCE_SETS = {
   ],
 };
 
-export { MEDIA, RESOURCE_SETS };
+const SECTION_MEDIA = {
+  'what-is-indonesia': [
+    ['/media/01-archipelago.svg', 'Island worlds', 'Different landscapes and sea distances helped local communities develop distinct ways of living.'],
+    ['/media/real/01-archipelago.jpg', 'Routes across water', 'The archipelago map makes movement, exchange, and connection visible.'],
+    ['/media/03-identity.svg', 'Layered belonging', 'A shared national identity can hold many local languages, histories, and traditions.'],
+  ],
+  'map-of-indonesia': [
+    ['/media/02-geography.svg', 'Geography shapes possibility', 'Land, climate, and distance help explain where people settle and how they move.'],
+    ['/media/real/02-jakarta.jpg', 'A connected coastal city', 'Jakarta makes the role of ports, migration, and regional movement concrete.'],
+    ['/media/real/04-borobudur.jpg', 'Place and wider worlds', 'A local monument can reveal wider networks of religion, craft, and political power.'],
+  ],
+  'peoples-and-languages': [
+    ['/media/03-identity.svg', 'Identity has layers', 'Nationality, ethnicity, language, religion, and place answer different questions.'],
+    ['/media/real/03-batik.jpg', 'Culture in practice', 'Batik shows how local knowledge, craft, language, and identity become visible.'],
+    ['/media/real/06-independence.jpg', 'Shared public language', 'A national language helps people communicate while local languages remain meaningful.'],
+  ],
+  'trade-and-kingdoms': [
+    ['/media/04-trade.svg', 'Ports as meeting points', 'Ports connected products, people, languages, religious ideas, and political claims.'],
+    ['/media/real/02-jakarta.jpg', 'Maritime networks', 'Coastal cities help us see how power can travel through routes rather than borders.'],
+    ['/media/real/04-borobudur.jpg', 'Memory in monuments', 'Monuments preserve evidence of craftsmanship, belief, patronage, and historical memory.'],
+  ],
+  'religion-and-adat': [
+    ['/media/05-adat.svg', 'Custom and community', 'Adat is a living set of local norms and practices, not one national rulebook.'],
+    ['/media/real/05-wayang.jpg', 'Belief and performance', 'Wayang shows how stories, art, belief, and community practice can overlap.'],
+    ['/media/real/03-batik.jpg', 'Adaptation over time', 'Everyday traditions can preserve older patterns while taking on new meanings.'],
+  ],
+  'modern-indonesia': [
+    ['/media/06-modern.svg', 'A national framework', 'Independence created a political framework across a very large and diverse archipelago.'],
+    ['/media/real/06-independence.jpg', 'Citizenship in practice', 'National identity is experienced through local communities, celebrations, and public life.'],
+    ['/media/real/02-jakarta.jpg', 'Many regional futures', 'Modern debates connect national institutions with different regional priorities.'],
+  ],
+};
+
+export { MEDIA, RESOURCE_SETS, SECTION_MEDIA };

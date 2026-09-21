@@ -13,13 +13,24 @@ import {
   shouldRemindToday,
 } from './core.js';
 import { LESSONS } from './content.js';
-import { MEDIA, RESOURCE_SETS } from './resources.js';
+import { MEDIA, RESOURCE_SETS, SECTION_MEDIA } from './resources.js';
 
 test('resource data stays separate from lesson content', () => {
   assert.equal(LESSONS[0].media, undefined);
   assert.equal(LESSONS[0].resources, undefined);
   assert.equal(MEDIA[LESSONS[0].id].creditUrl.includes('commons.wikimedia.org'), true);
   assert.equal(RESOURCE_SETS[LESSONS[0].id].length, 2);
+});
+
+test('every class section has its own visual asset and explanation', () => {
+  LESSONS.forEach((lesson) => {
+    assert.equal(SECTION_MEDIA[lesson.id].length, lesson.sections.length);
+    SECTION_MEDIA[lesson.id].forEach(([src, title, purpose]) => {
+      assert.ok(src.startsWith('/media/'));
+      assert.ok(title.length > 3);
+      assert.ok(purpose.length > 20);
+    });
+  });
 });
 
 test('the first class teaches through readings with a check for each section', () => {
