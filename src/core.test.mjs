@@ -26,7 +26,8 @@ test('every class section has its own visual asset and explanation', () => {
   LESSONS.forEach((lesson) => {
     assert.equal(SECTION_MEDIA[lesson.id].length, lesson.sections.length);
     SECTION_MEDIA[lesson.id].forEach(([src, title, purpose]) => {
-      assert.ok(src.startsWith('/media/'));
+      assert.ok(src.startsWith('/media/real/'));
+      assert.match(src, /\.(jpg|jpeg|png|webp)$/i);
       assert.ok(title.length > 3);
       assert.ok(purpose.length > 20);
     });
