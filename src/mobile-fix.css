@@ -1,0 +1,10 @@
+
+@media (max-width: 720px) {
+  .class-grid { display: flex; flex-direction: column; gap: 18px; }
+  .lesson-panel { order: 1; min-width: 0; }
+  .lesson-media { order: 2; position: static; width: 100%; }
+  .lesson-media img { min-height: 0; aspect-ratio: 4 / 3; }
+  .lesson-media figcaption { font-size: 10px; }
+  .hero-copy h2 { font-size: 38px; }
+  .story-card p { font-size: 16px; }
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "local": "/media/real/01-archipelago.jpg",
+    "title": "File:AMH Map of Indonesian Archipelago.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File%3AAMH_Map_of_Indonesian_Archipelago.jpg",
+    "author": "<p>Doetechum, Joannes / Baptista \u00e0 / van (engraver / etcher) </p> Nicolaasz., Cornelis (publisher)",
+    "license": "Public domain",
+    "size": 966280,
+    "mime": "image/jpeg"
+  },
+  {
+    "local": "/media/real/02-jakarta.jpg",
+    "title": "File:Jakarta Panorama.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File%3AJakarta_Panorama.jpg",
+    "author": "<a href=\"//commons.wikimedia.org/wiki/User:Gunkarta\" title=\"User:Gunkarta\">Gunawan Kartapranata</a>",
+    "license": "CC BY-SA 3.0",
+    "size": 420752,
+    "mime": "image/jpeg"
+  },
+  {
+    "local": "/media/real/03-batik.jpg",
+    "title": "File:Batik Artisan Applying Wax with Canting in Trusmi Cirebon Indonesia.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File%3ABatik_Artisan_Applying_Wax_with_Canting_in_Trusmi_Cirebon_Indonesia.jpg",
+    "author": "<a href=\"//commons.wikimedia.org/wiki/User:Ahaetulla\" title=\"User:Ahaetulla\">Ahaetulla</a>",
+    "license": "CC BY-SA 4.0",
+    "size": 674742,
+    "mime": "image/jpeg"
+  },
+  {
+    "local": "/media/real/04-borobudur.jpg",
+    "title": "File:Borobudur-Nothwest-view.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File%3ABorobudur-Nothwest-view.jpg",
+    "author": "<a href=\"//commons.wikimedia.org/wiki/User:Gunkarta\" title=\"User:Gunkarta\">Gunawan Kartapranata</a>",
+    "license": "CC BY-SA 3.0",
+    "size": 518688,
+    "mime": "image/jpeg"
+  },
+  {
+    "local": "/media/real/05-wayang.jpg",
+    "title": "File:Pertunjukan Wayang Kulit.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File%3APertunjukan_Wayang_Kulit.jpg",
+    "author": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:FaizAttariqi&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:FaizAttariqi (page does not exist)\">FaizAttariqi</a>",
+    "license": "CC BY-SA 4.0",
+    "size": 352855,
+    "mime": "image/jpeg"
+  },
+  {
+    "local": "/media/real/06-independence.jpg",
+    "title": "File:Group of children celebrating Indonesian Independence Day, Yogyakarta, 20220816 2017 8534.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File%3AGroup_of_children_celebrating_Indonesian_Independence_Day%2C_Yogyakarta%2C_20220816_2017_8534.jpg",
+    "author": "<a href=\"//commons.wikimedia.org/wiki/User:Jakubhal\" title=\"User:Jakubhal\">Jakub Ha\u0142un</a>",
+    "license": "CC BY-SA 4.0",
+    "size": 476245,
+    "mime": "image/jpeg"
+  }
+]

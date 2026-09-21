@@ -4,6 +4,7 @@ import {
   calculateProgress, completeLesson, createInitialState, getDueReviews, getLevelSummary, getNextLearningAction, getToday, markAnswer, normalizeState, reviewLesson, shouldRemindToday,
 } from './core.js';
 import './styles.css';
+import './mobile-fix.css';
 
 const STORAGE_KEY = 'nusantara-learning-state-v1';
 let state = loadState();
