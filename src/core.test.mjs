@@ -5,6 +5,7 @@ import {
   completeLesson,
   createInitialState,
   getDueReviews,
+  getNextLearningAction,
   getNextLesson,
   markAnswer,
   normalizeState,
@@ -128,6 +129,20 @@ test('completing a lesson schedules its first spaced review', () => {
   assert.deepEqual(getDueReviews(next, '2026-09-18'), []);
   assert.deepEqual(getDueReviews(next, '2026-09-19'), ['what-is-indonesia']);
 });
+
+test('the home action prioritizes a due review without moving the resume lesson', () => {
+  const completed = completeLesson(createInitialState(), 'what-is-indonesia', '2026-09-18');
+  const action = getNextLearningAction({ ...completed, currentLessonId: 'map-of-indonesia' }, LESSONS, '2026-09-19');
+  assert.deepEqual(action, { type: 'review', lessonId: 'what-is-indonesia', dueCount: 1 });
+});
+
+test('the home action resumes the current lesson when no review is due', () => {
+  const state = { ...createInitialState(), currentLessonId: 'map-of-indonesia' };
+  assert.deepEqual(getNextLearningAction(state, LESSONS, '2026-09-18'), {
+    type: 'lesson', lessonId: 'map-of-indonesia', dueCount: 0,
+  });
+});
+
 
 test('streak continues only on the immediately following study day', () => {
   const first = completeLesson(createInitialState(), 'what-is-indonesia', '2026-09-18');

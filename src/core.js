@@ -142,6 +142,14 @@ export function getDueReviews(state, today) {
   return normalized.completedLessonIds.filter((lessonId) => normalized.reviews[lessonId]?.nextReviewDate <= today);
 }
 
+export function getNextLearningAction(state, lessons, today) {
+  const normalized = normalizeState(state);
+  const dueReviews = getDueReviews(normalized, today);
+  if (dueReviews.length) return { type: 'review', lessonId: dueReviews[0], dueCount: dueReviews.length };
+  const current = lessons.find((lesson) => lesson.id === normalized.currentLessonId) || lessons[0] || null;
+  return { type: 'lesson', lessonId: current?.id || null, dueCount: 0 };
+}
+
 export function reviewLesson(state, lessonId, today, remembered) {
   const next = normalizeState(state);
   if (!next.completedLessonIds.includes(lessonId)) return next;
