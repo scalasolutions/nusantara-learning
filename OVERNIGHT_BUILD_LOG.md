@@ -1,3 +1,8 @@
+## 2026-09-21 07:36 WIB
+- Added spaced-review activity to the learner history: remembered reviews show their +5 XP reward, postponed reviews are labeled separately, and the original class-completion milestone remains intact for compatibility. The dashboard presents the newest activity first while the persisted history contract remains backward-compatible.
+- Verification: strict TDD RED test failed before implementation; GREEN `npm test` (17 passing), `npm run build` (Vite production build passed), `git diff --check` (passed), and live Vite smoke checks confirmed the app shell, module output, and service worker endpoint. Full interactive browser automation remains unavailable because Chrome/Chromium and Playwright are not installed in this environment.
+- Remaining risks: history is still device-local and capped at 30 entries; browser notifications are best-effort and do not guarantee delivery while the app is closed; no cloud sync, auth, payments, or reliable external scheduler is included.
+
 ## 2026-09-21 07:02 WIB
 - Added meaningful XP progression to the learner dashboard: four named levels (Curious Explorer → Nusantara Scholar), safe milestone calculations, remaining-XP messaging, and an accessible progress bar. Existing XP, completion, review, and local-storage state remain unchanged.
 - Verification: strict TDD RED test failed because `getLevelSummary` was missing; GREEN focused tests passed, then `npm test` (16 passing), `npm run build` (Vite production build passed), `git diff --check` (passed), and local Vite HTTP smoke checks confirmed the app shell, manifest, and service worker endpoints. Full interactive browser automation remains unavailable because Chrome/Chromium and Playwright are not installed.

@@ -151,6 +151,13 @@ export function reviewLesson(state, lessonId, today, remembered) {
     ...next.reviews,
     [lessonId]: { interval, nextReviewDate: addDays(today, REVIEW_INTERVALS[Math.max(1, interval)]) },
   };
+  next.history = [...next.history, {
+    lessonId,
+    date: today,
+    type: 'review',
+    remembered,
+    xp: remembered ? REVIEW_XP : 0,
+  }].slice(-30);
   if (remembered) next.xp += REVIEW_XP;
   return next;
 }

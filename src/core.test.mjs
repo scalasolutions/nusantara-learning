@@ -151,3 +151,12 @@ test('a missed review resets to a short interval and remains due today', () => {
   assert.deepEqual(reviewed.reviews['what-is-indonesia'], { interval: 0, nextReviewDate: '2026-09-21' });
   assert.deepEqual(getDueReviews(reviewed, '2026-09-21'), ['what-is-indonesia']);
 });
+
+test('review actions append activity without rewriting the original completion milestone', () => {
+  const completed = completeLesson(createInitialState(), 'what-is-indonesia', '2026-09-18');
+  const reviewed = reviewLesson(completed, 'what-is-indonesia', '2026-09-19', true);
+  assert.deepEqual(reviewed.history.slice(0, 2), [
+    { lessonId: 'what-is-indonesia', date: '2026-09-18', xp: 100 },
+    { lessonId: 'what-is-indonesia', date: '2026-09-19', type: 'review', remembered: true, xp: 5 },
+  ]);
+});
