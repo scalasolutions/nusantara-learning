@@ -22,6 +22,16 @@ test('resource data stays separate from lesson content', () => {
   assert.equal(RESOURCE_SETS[LESSONS[0].id].length, 2);
 });
 
+test('the first class teaches through readings with a check for each section', () => {
+  const lesson = LESSONS[0];
+  assert.equal(lesson.sections.length, 3);
+  lesson.sections.forEach((section) => {
+    assert.ok(section.reading.length > 100);
+    assert.equal(section.answers.length, 4);
+    assert.ok(section.question.length > 20);
+  });
+});
+
 test('new learners start at lesson one with zero XP', () => {
   const state = createInitialState();
   assert.equal(state.currentLessonId, 'what-is-indonesia');
