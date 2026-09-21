@@ -1,10 +1,24 @@
 
+.mobile-course-menu { display: none; }
+.onboarding-start { display: inline-block; text-decoration: none; margin: 2px auto 0; }
+.profile-setup { width: min(100%, 480px); margin-top: 20px; text-align: left; color: var(--green); font-size: 12px; font-weight: 700; }
+.profile-setup summary { cursor: pointer; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: #fffefa; }
+.profile-setup[open] summary { border-radius: 10px 10px 0 0; }
+.profile-setup .onboarding-form { width: 100%; border-top: 0; border-radius: 0 0 14px 14px; box-shadow: none; }
 @media (max-width: 720px) {
+  .layout:has(.class-header) .sidebar { display: none; }
+  .layout:has(.class-header) { display: block; }
+  .layout:has(.class-header) .content { padding-top: 18px; }
+  .mobile-course-menu { display: block; margin-left: auto; margin-right: 10px; color: var(--green); font-size: 11px; }
+  .mobile-course-menu summary { cursor: pointer; padding: 8px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); list-style: none; }
+  .mobile-course-menu .lesson-nav { display: grid; position: absolute; z-index: 5; width: calc(100vw - 34px); margin-top: 7px; padding: 10px; border: 1px solid var(--line); border-radius: 13px; background: var(--paper); box-shadow: 0 12px 25px #224c3e20; }
+  .mobile-course-menu .lesson-nav-item { min-width: 0; }
+  .class-header { align-items: center; }
+  .class-progress-label { font-size: 10px; }
   .class-grid { display: flex; flex-direction: column; gap: 18px; }
-  .lesson-panel { order: 1; min-width: 0; }
-  .lesson-media { order: 2; position: static; width: 100%; }
-  .lesson-media img { min-height: 0; aspect-ratio: 4 / 3; }
-  .lesson-media figcaption { font-size: 10px; }
-  .hero-copy h2 { font-size: 38px; }
-  .story-card p { font-size: 16px; }
+  .lesson-aside { display: contents; }
+  .lesson-aside .lesson-media { order: -1; position: static; }
+  .lesson-panel { order: 1; }
+  .lesson-aside .class-side-card { order: 3; }
+  .lesson-media img { aspect-ratio: 4 / 3; }
 }
