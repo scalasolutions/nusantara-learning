@@ -139,7 +139,9 @@ function addDays(dateString, days) {
 
 export function getDueReviews(state, today) {
   const normalized = normalizeState(state);
-  return normalized.completedLessonIds.filter((lessonId) => normalized.reviews[lessonId]?.nextReviewDate <= today);
+  return normalized.completedLessonIds
+    .filter((lessonId) => normalized.reviews[lessonId]?.nextReviewDate <= today)
+    .sort((left, right) => normalized.reviews[left].nextReviewDate.localeCompare(normalized.reviews[right].nextReviewDate));
 }
 
 export function getNextLearningAction(state, lessons, today) {

@@ -130,6 +130,17 @@ test('completing a lesson schedules its first spaced review', () => {
   assert.deepEqual(getDueReviews(next, '2026-09-19'), ['what-is-indonesia']);
 });
 
+test('due reviews are ordered by the oldest scheduled review date', () => {
+  const state = normalizeState({
+    completedLessonIds: ['map-of-indonesia', 'what-is-indonesia'],
+    reviews: {
+      'map-of-indonesia': { interval: 1, nextReviewDate: '2026-09-18' },
+      'what-is-indonesia': { interval: 1, nextReviewDate: '2026-09-17' },
+    },
+  });
+  assert.deepEqual(getDueReviews(state, '2026-09-19'), ['what-is-indonesia', 'map-of-indonesia']);
+});
+
 test('the home action prioritizes a due review without moving the resume lesson', () => {
   const completed = completeLesson(createInitialState(), 'what-is-indonesia', '2026-09-18');
   const action = getNextLearningAction({ ...completed, currentLessonId: 'map-of-indonesia' }, LESSONS, '2026-09-19');
