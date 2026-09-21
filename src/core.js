@@ -2,6 +2,12 @@ export const LESSON_XP = 100;
 export const ANSWER_XP = 10;
 export const REVIEW_XP = 5;
 export const REVIEW_INTERVALS = [0, 1, 3, 7, 14, 30];
+export const LEVELS = [
+  { name: 'Curious Explorer', minXp: 0 },
+  { name: 'Island Mapper', minXp: 100 },
+  { name: 'Archipelago Guide', minXp: 250 },
+  { name: 'Nusantara Scholar', minXp: 500 },
+];
 export const DEFAULT_LESSON_ORDER = [
   'what-is-indonesia',
   'map-of-indonesia',
@@ -73,6 +79,23 @@ export function getNextLesson(state, lessons) {
 export function calculateProgress(state, totalLessons) {
   if (!totalLessons) return 0;
   return Math.min(100, Math.round((state.completedLessonIds.length / totalLessons) * 100));
+}
+
+export function getLevelSummary(xp = 0) {
+  const safeXp = Number.isFinite(xp) && xp >= 0 ? xp : 0;
+  const currentIndex = LEVELS.reduce((index, level, candidateIndex) => (
+    level.minXp <= safeXp ? candidateIndex : index
+  ), 0);
+  const current = LEVELS[currentIndex];
+  const next = LEVELS[currentIndex + 1] || null;
+  if (!next) return { current, next: null, progress: 100, remainingXp: 0 };
+  const span = next.minXp - current.minXp;
+  return {
+    current,
+    next,
+    progress: Math.round(((safeXp - current.minXp) / span) * 100),
+    remainingXp: next.minXp - safeXp,
+  };
 }
 
 export function completeLesson(state, lessonId, today, lessons = DEFAULT_LESSON_ORDER.map((id) => ({ id }))) {

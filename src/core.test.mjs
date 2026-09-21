@@ -31,6 +31,32 @@ test('new learners start at lesson one with zero XP', () => {
   assert.equal(state.onboardingCompleted, false);
 });
 
+test('XP maps to a named level and progress toward the next milestone', async () => {
+  const { getLevelSummary } = await import('./core.js');
+  assert.deepEqual(getLevelSummary(0), {
+    current: { name: 'Curious Explorer', minXp: 0 },
+    next: { name: 'Island Mapper', minXp: 100 },
+    progress: 0,
+    remainingXp: 100,
+  });
+  assert.deepEqual(getLevelSummary(175), {
+    current: { name: 'Island Mapper', minXp: 100 },
+    next: { name: 'Archipelago Guide', minXp: 250 },
+    progress: 50,
+    remainingXp: 75,
+  });
+});
+
+test('the highest level stays complete instead of overflowing its progress bar', async () => {
+  const { getLevelSummary } = await import('./core.js');
+  assert.deepEqual(getLevelSummary(999), {
+    current: { name: 'Nusantara Scholar', minXp: 500 },
+    next: null,
+    progress: 100,
+    remainingXp: 0,
+  });
+});
+
 test('legacy learners with activity skip the new onboarding screen', () => {
   const state = normalizeState({ xp: 100, completedLessonIds: ['what-is-indonesia'] });
   assert.equal(state.onboardingCompleted, true);

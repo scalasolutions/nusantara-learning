@@ -38,3 +38,5 @@ button { cursor: pointer; }
 .onboarding-form textarea { min-height: 70px; resize: vertical; }
 .onboarding-form .primary-button { justify-self: start; margin-top: 5px; }
 .onboarding-note { margin-top: 18px; color: var(--muted); font-size: 10px; }
+.level-card { display: flex; align-items: center; justify-content: space-between; gap: 25px; margin: 18px 0; padding: 20px 22px; border: 1px solid #d8e8d8; border-radius: 16px; background: linear-gradient(110deg, #edf6ec, #fffefa); }.level-card h2 { margin: 6px 0 3px; font-family: 'Playfair Display', serif; font-size: 22px; }.level-card p { margin: 0; color: var(--muted); font-size: 11px; }.level-progress { width: min(300px, 40%); }.level-progress .progress-label { margin-bottom: 7px; color: var(--muted); font-size: 10px; }.level-progress .progress-track { height: 8px; }
+@media (max-width: 720px) { .level-card { align-items: flex-start; flex-direction: column; }.level-progress { width: 100%; } }
