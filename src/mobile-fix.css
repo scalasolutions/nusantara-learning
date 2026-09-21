@@ -17,6 +17,13 @@
 .section-result.success { color: #2b8067; }.section-result.retry { color: #a45d54; }
 .synthesis-quiz { margin-top: 31px; }.synthesis-quiz .quiz-heading p { margin: 7px 0 0; color: #c6ddd3; font-size: 11px; }
 .vocab-intro { margin: -3px 0 13px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.story-card small { display: block; margin-top: 13px; color: #765337; font-size: 11px; line-height: 1.55; opacity: .86; }
+.vocab-practice { margin-top: 18px; padding-top: 17px; border-top: 1px solid #dfe9e1; }
+.vocab-result { min-height: 18px; margin-top: 10px; font-size: 11px; font-weight: 700; }.vocab-result.success { color: #2b8067; }.vocab-result.retry { color: #a45d54; }
+.completion-status { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.45; }.completion-status.ready { color: #2b8067; font-weight: 700; }
+.primary-button:disabled { cursor: not-allowed; opacity: .48; filter: grayscale(.25); }
+.resources-intro { margin: -4px 0 15px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.lesson-media figcaption small { display: inline-block; margin-top: 6px; font-size: 9px; }
 @media (max-width: 720px) {
   .reading-section { padding: 18px 16px; }
   .reading-section h3 { font-size: 19px; }

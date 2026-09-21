@@ -32,6 +32,19 @@ test('the first class teaches through readings with a check for each section', (
   });
 });
 
+test('all six classes have outcomes and three section readings with checks', () => {
+  assert.equal(LESSONS.length, 6);
+  LESSONS.forEach((lesson) => {
+    assert.ok(lesson.outcome.length > 40);
+    assert.equal(lesson.sections.length, 3);
+    lesson.sections.forEach((section) => {
+      assert.ok(section.reading.length > 100);
+      assert.equal(section.answers.length, 4);
+      assert.ok(section.question.length > 20);
+    });
+  });
+});
+
 test('new learners start at lesson one with zero XP', () => {
   const state = createInitialState();
   assert.equal(state.currentLessonId, 'what-is-indonesia');
